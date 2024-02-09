@@ -1,11 +1,11 @@
 package tumblr.api.tumblr_api.post;
 
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import tumblr.api.tumblr_api.controllers.IController;
+import tumblr.api.tumblr_api.exceptions.BadRequestException;
 import tumblr.api.tumblr_api.exceptions.ElementNotFoundException;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/post")
-public class PostController implements IController<Post, PostDTO> {
+public class PostController implements IController<Post, NewPostDTO, EditPostDTO> {
 
     @Autowired
     PostService postSrv;
@@ -26,7 +26,7 @@ public class PostController implements IController<Post, PostDTO> {
     }
 
     @Override
-    @GetMapping("/")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<Post> find(String name) throws Exception {
         if (name != null) {
@@ -46,14 +46,15 @@ public class PostController implements IController<Post, PostDTO> {
     @Override
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Post findByIdAndUpdate(UUID id, PostDTO body, BindingResult validation) throws Exception {
+    public Post findByIdAndUpdate(UUID id, EditPostDTO body, BindingResult validation) throws Exception {
         if (validation.hasErrors()) throw new BadRequestException(String.valueOf(validation.getAllErrors()));
         return this.postSrv.findByIdAndUpdate(id, body);
     }
 
     @Override
     @PostMapping
-    public Post create(PostDTO body, BindingResult validation) throws BadRequestException {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Post create(@ModelAttribute NewPostDTO body, BindingResult validation) throws RuntimeException {
         if (validation.hasErrors()) {
             throw new BadRequestException(String.valueOf(validation.getAllErrors()));
         } else {

@@ -22,7 +22,7 @@ public class Post extends IEntity {
     private String[] images;
     private String[] tags;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

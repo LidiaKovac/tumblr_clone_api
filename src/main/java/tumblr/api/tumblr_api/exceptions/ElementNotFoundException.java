@@ -5,15 +5,10 @@ import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 
-        import java.util.UUID;
-public class ElementNotFoundException extends Exception{
-    public UUID id;
+import java.util.UUID;
 
+public class ElementNotFoundException extends Exception {
     public ElementNotFoundException(UUID id) {
-        this.id = id;
-    }
-
-    public String toString() {
-        return "Entity not found, id: " + id;
+        super(String.valueOf(id));
     }
 }

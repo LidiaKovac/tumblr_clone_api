@@ -1,8 +1,9 @@
 package tumblr.api.tumblr_api.user;
 
 import jakarta.validation.constraints.*;
+import org.springframework.web.multipart.MultipartFile;
 
-public record UserDTO(
+public record NewUserDTO(
         @NotEmpty(message = "Please enter a name")
         @NotNull(message = "Please enter a name")
         String name,
@@ -17,8 +18,7 @@ public record UserDTO(
         @NotEmpty(message = "Enter a password with at least one uppercase letter, a symbol and at least 8 characters")
         @Pattern(regexp = "^(?=.*[A-Z])(?=.*[\\W_]).{8,}$", message = "Enter a password with at least one uppercase letter, a symbol and at least 8 characters")
         String password,
-        String avatar,
-        User[] followers,
-        User[] following
+        MultipartFile avatarFile,
+        String avatar
 ) {
 }

@@ -2,7 +2,7 @@ package tumblr.api.tumblr_api.post;
 
 import jakarta.validation.constraints.*;
 
-public record PostDTO(
+public record NewPostDTO(
         @NotEmpty(message = "Post must have at least 1 character.")
         @Size(max = 100000, message = "Your post exceeds the 100k character limit")
         String markDownContent,

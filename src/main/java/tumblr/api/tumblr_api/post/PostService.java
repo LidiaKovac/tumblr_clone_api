@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class PostService implements IService<Post, PostDTO> {
+public class PostService implements IService<Post, NewPostDTO, EditPostDTO> {
 
     @Autowired
     PostRepository repo;
@@ -21,7 +21,7 @@ public class PostService implements IService<Post, PostDTO> {
     UserRepository userRepo;
 
     @Override
-    public Post save(PostDTO obj) throws BadRequestException {
+    public Post save(NewPostDTO obj) throws BadRequestException {
         List<User> owner = this.userRepo.findOneByEmail(obj.userEmail());
         if(!owner.isEmpty()) {
             return this.repo.save(new Post(obj.markDownContent(), obj.images(), obj.tags(), owner.get(0)));
@@ -42,7 +42,7 @@ public class PostService implements IService<Post, PostDTO> {
         return this.repo.findByMarkDownContentContainsIgnoreCase(query);
     }
     @Override
-    public Post findByIdAndUpdate(UUID id, PostDTO obj) throws Exception {
+    public Post findByIdAndUpdate(UUID id, EditPostDTO obj) throws Exception {
         Post found = this.findById(id);
         found.setImages(obj.images());
         found.setMarkDownContent(obj.markDownContent());
