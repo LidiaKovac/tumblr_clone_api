@@ -1,5 +1,8 @@
 package tumblr.api.tumblr_api.post;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
 import tumblr.api.tumblr_api.exceptions.BadRequestException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +12,7 @@ import tumblr.api.tumblr_api.services.IService;
 import tumblr.api.tumblr_api.user.User;
 import tumblr.api.tumblr_api.user.UserRepository;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +23,8 @@ public class PostService implements IService<Post, NewPostDTO, EditPostDTO> {
     PostRepository repo;
     @Autowired
     UserRepository userRepo;
-
+    @Autowired
+    Cloudinary cloudinary;
     @Override
     public Post save(NewPostDTO obj) throws BadRequestException {
         List<User> owner = this.userRepo.findOneByEmail(obj.userEmail());
@@ -54,5 +59,9 @@ public class PostService implements IService<Post, NewPostDTO, EditPostDTO> {
     public void findByIdAndDelete(UUID id) throws ElementNotFoundException {
         Post found = this.findById(id);
         this.repo.delete(found);
+    }
+
+    public String upload(MultipartFile file) throws IOException {
+       return (String)this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap()).get("url");
     }
 }

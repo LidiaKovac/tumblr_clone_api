@@ -24,6 +24,8 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = {"http://localhost:5173/"})
+
 public class UserController implements IController<User, NewUserDTO, EditUserDTO> {
 
     @Autowired
