@@ -66,10 +66,8 @@ public class UserController implements IController<User, NewUserDTO, EditUserDTO
 
     @Override
     @GetMapping("")
-    public List<User> find(String email) throws Exception {
-        if (email != null) {
-            return this.userSrv.findByEmail(email);
-        } else return this.userSrv.find();
+    public List<User> find(String name) throws Exception {
+        return this.userSrv.find();
     }
 
     @Override

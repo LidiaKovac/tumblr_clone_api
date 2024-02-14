@@ -27,15 +27,15 @@ public class PostService implements IService<Post, NewPostDTO, EditPostDTO> {
     Cloudinary cloudinary;
     @Override
     public Post save(NewPostDTO obj) throws BadRequestException {
-        List<User> owner = this.userRepo.findOneByEmail(obj.userEmail());
-        if(!owner.isEmpty()) {
-            return this.repo.save(new Post(obj.markDownContent(), obj.images(), obj.tags(), owner.get(0)));
+       User owner = this.userRepo.findOneByEmail(obj.userEmail());
+        if(owner != null) {
+            return this.repo.save(new Post(obj.markDownContent(), obj.images(), obj.tags(), owner));
         } else throw new BadRequestException("This post doesn't seem to belong to anybody.");
     }
 
     @Override
     public Post findById(UUID id) throws ElementNotFoundException {
-        return this.repo.findById(id).orElseThrow(() -> new ElementNotFoundException(id));
+        return this.repo.findById(id).orElseThrow(() -> new ElementNotFoundException(id.toString()));
     }
 
     @Override

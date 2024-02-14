@@ -34,7 +34,7 @@ public class UserService implements IService<User, NewUserDTO, EditUserDTO> {
 
     @Override
     public User findById(UUID id) throws ElementNotFoundException {
-        return this.repo.findById(id).orElseThrow(() -> new ElementNotFoundException(id));
+        return this.repo.findById(id).orElseThrow(() -> new ElementNotFoundException(id.toString()));
     }
 
     @Override
@@ -42,13 +42,16 @@ public class UserService implements IService<User, NewUserDTO, EditUserDTO> {
         return this.repo.findAll();
     }
 
-    public List<User> findByEmail(String email) {
-        return this.repo.findOneByEmail(email);
+    public User findByEmail(String email) throws ElementNotFoundException {
+        User found = this.repo.findOneByEmail(email);
+        if(found != null) {
+            return found;
+        } else throw new ElementNotFoundException(email);
     }
 
     @Override
     public User findByIdAndUpdate(UUID id, EditUserDTO obj) throws Exception {
-        User found = this.repo.findById(id).orElseThrow(() -> new ElementNotFoundException(id));
+        User found = this.repo.findById(id).orElseThrow(() -> new ElementNotFoundException(id.toString()));
         found.setBlogTitle(obj.blogTitle());
         found.setName(obj.name());
         this.repo.save(found);
@@ -57,7 +60,7 @@ public class UserService implements IService<User, NewUserDTO, EditUserDTO> {
 
     @Override
     public void findByIdAndDelete(UUID id) throws ElementNotFoundException {
-        User found = this.repo.findById(id).orElseThrow(() -> new ElementNotFoundException(id));
+        User found = this.repo.findById(id).orElseThrow(() -> new ElementNotFoundException(id.toString()));
         repo.delete(found);
     }
 

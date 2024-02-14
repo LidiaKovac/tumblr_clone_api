@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 
 import java.util.UUID;
 
-public class ElementNotFoundException extends Exception {
-    public ElementNotFoundException(UUID id) {
-        super(String.valueOf(id));
+public class ElementNotFoundException extends RuntimeException {
+    public ElementNotFoundException(String name) {
+        super(String.valueOf(name));
     }
 }

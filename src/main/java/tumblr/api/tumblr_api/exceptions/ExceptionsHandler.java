@@ -24,28 +24,15 @@ public class ExceptionsHandler {
         return new ErrorDTO(error.getMessage(), LocalDateTime.now());
     }
 
-//    @ExceptionHandler(MissingServletRequestPartException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ErrorDTO handleFD400(MissingServletRequestPartException error) {
-//        return new ErrorDTO(error.getMessage(), LocalDateTime.now());
-//    }
-
-//    @ExceptionHandler(DataIntegrityViolationException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ErrorDTO alreadyExists(BadRequestException error) {
-//        return new ErrorDTO("This email is already in use. Details: " + error, LocalDateTime.now());
-//    }
-
-
-//    @ExceptionHandler(Exception.class)
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public ErrorDTO handle500(Exception error) {
-//        return new ErrorDTO("Dang! What's happening? Details: " + error.getMessage(), LocalDateTime.now());
-//    }
-
     @ExceptionHandler(ElementNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorDTO handleEntityNotFound(ElementNotFoundException error) {
         return new ErrorDTO("Entity not found: " + error.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorDTO handle401(UnauthorizedException err) {
+        return new ErrorDTO("Login failed. Details: " + err , LocalDateTime.now());
     }
 }
