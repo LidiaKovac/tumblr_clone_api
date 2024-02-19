@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -18,7 +20,8 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Component
-public class AuthMiddleware extends OncePerRequestFilter {
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class AuthFilter extends OncePerRequestFilter {
     @Autowired
     JWTTools tools;
 
@@ -26,19 +29,20 @@ public class AuthMiddleware extends OncePerRequestFilter {
     UserService srv;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, UnauthorizedException {
         String authToken = request.getHeader("Authorization");
         if (authToken == null || !authToken.startsWith("Bearer ")) {
             throw new UnauthorizedException("Please send token!");
         }
         String cleanToken = authToken.substring(7);
+
         tools.verifyToken(cleanToken);
 
         String id = tools.decodeToken(cleanToken);
         User user = this.srv.findById(UUID.fromString(id));
 
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null);
-
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        System.out.println(auth);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         filterChain.doFilter(request, response); //next() di express
@@ -46,6 +50,6 @@ public class AuthMiddleware extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest req) {
-    return new AntPathMatcher().match("/auth/**", req.getServletPath());
+        return new AntPathMatcher().match("/auth/**", req.getServletPath());
     }
 }

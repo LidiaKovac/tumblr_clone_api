@@ -29,11 +29,16 @@ public class UserService implements IService<User, NewUserDTO, EditUserDTO> {
 
     @Override
     public User save(NewUserDTO obj) {
+        this.repo.findOneByEmail(obj.email()).ifPresent(user -> {
+            throw new BadRequestException("Email is already in use!");
+        });
+
         return this.repo.save(new User(obj.email(), obj.name(), obj.blogTitle(), obj.password(), obj.avatar()));
     }
 
     @Override
     public User findById(UUID id) throws ElementNotFoundException {
+
         return this.repo.findById(id).orElseThrow(() -> new ElementNotFoundException(id.toString()));
     }
 
@@ -43,8 +48,8 @@ public class UserService implements IService<User, NewUserDTO, EditUserDTO> {
     }
 
     public User findByEmail(String email) throws ElementNotFoundException {
-        User found = this.repo.findOneByEmail(email);
-        if(found != null) {
+        User found = this.repo.findOneByEmail(email).orElseThrow(() -> new ElementNotFoundException(email));
+        if (found != null) {
             return found;
         } else throw new ElementNotFoundException(email);
     }
@@ -73,7 +78,7 @@ public class UserService implements IService<User, NewUserDTO, EditUserDTO> {
         User toFollow = this.findById(followId);
 //        Set person A following person B
         List<User> foll = found.getFollowing();
-        if(foll.stream().map((user) -> user.getId()).toList().contains(followId)) {
+        if (foll.stream().map((user) -> user.getId()).toList().contains(followId)) {
             throw new BadRequestException("You are already following this person.");
         }
         foll.add(toFollow);

@@ -1,21 +1,20 @@
 package tumblr.api.tumblr_api.user;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import tumblr.api.tumblr_api.controllers.IController;
+import tumblr.api.tumblr_api.entities.Roles;
 import tumblr.api.tumblr_api.exceptions.BadRequestException;
 import tumblr.api.tumblr_api.exceptions.ElementNotFoundException;
 import tumblr.api.tumblr_api.post.NewPostDTO;
 
+import javax.management.relation.Role;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +24,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/user")
 @CrossOrigin(origins = {"http://localhost:5173/"})
-
 public class UserController implements IController<User, NewUserDTO, EditUserDTO> {
 
     @Autowired
@@ -48,7 +46,8 @@ public class UserController implements IController<User, NewUserDTO, EditUserDTO
                 found.getBlogTitle(),
                 found.getAvatar(),
                 found.getFollowers().size(),
-                found.getFollowing().size()
+                found.getFollowing().size(),
+                found.getRole().name()
         );
     }
 
@@ -65,20 +64,29 @@ public class UserController implements IController<User, NewUserDTO, EditUserDTO
     }
 
     @Override
-    @GetMapping("")
+    @GetMapping
     public List<User> find(String name) throws Exception {
         return this.userSrv.find();
     }
 
     @Override
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void findByIdAndDelete(UUID id) throws ElementNotFoundException {
-
+        this.userSrv.findByIdAndDelete(id);
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public User findByIdAndUpdate(UUID id, EditUserDTO body, BindingResult validation) throws Exception {
+        if(validation.hasErrors()) throw new BadRequestException(validation.toString());
+        return this.userSrv.findByIdAndUpdate(id, body);
+    }
+
+    @Override
+    public User create(NewUserDTO body, BindingResult validation) throws BadRequestException, IOException {
         return null;
     }
 
@@ -87,39 +95,4 @@ public class UserController implements IController<User, NewUserDTO, EditUserDTO
         return this.userSrv.addFollower(id, followId);
     }
 
-    @Override
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public User create(
-            @ModelAttribute NewUserDTO body,
-            BindingResult validation
-    ) throws IOException {
-        if (validation.hasErrors()) throw new BadRequestException(validation.toString());
-//        NewPostDTO created = new NewPostDTO(markDownContent, images, tags, userEmail);
-//        if (bname == null || email == null || blogTitle == null || password == null)
-//            throw new BadRequestException("name, email, blogTitle and password are required");
-        if (body.avatarFile() == null) {
-            NewUserDTO created = new NewUserDTO(
-                    body.name(),
-                    body.email(),
-                    body.blogTitle(),
-                    body.password(),
-                    null,
-                    "http://placehold.it/300x300");
-            return this.userSrv.save(created);
-
-        } else {
-            System.out.println(body.avatar());
-            String url = this.userSrv.uploadImage(body.avatarFile());
-            NewUserDTO created = new NewUserDTO(
-                    body.name(),
-                    body.email(),
-                    body.blogTitle(),
-                    body.password(),
-                    null,
-                    url);
-            return this.userSrv.save(created);
-        }
-
-    }
 }
