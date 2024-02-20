@@ -47,6 +47,13 @@ public class UserService implements IService<User, NewUserDTO, EditUserDTO> {
         return this.repo.findAll();
     }
 
+//    public Page<User> getUsers(int pageNumber, int size, String orderBy) {
+//        if (size > 100) size = 100;
+//        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by(orderBy));
+//        // Eventualmente posso anche ordinare con ordine decrescente con Sort.Direction.DESC
+//        return usersDAO.findAll(pageable);
+//    }
+
     public User findByEmail(String email) throws ElementNotFoundException {
         User found = this.repo.findOneByEmail(email).orElseThrow(() -> new ElementNotFoundException(email));
         if (found != null) {
@@ -56,6 +63,7 @@ public class UserService implements IService<User, NewUserDTO, EditUserDTO> {
 
     @Override
     public User findByIdAndUpdate(UUID id, EditUserDTO obj) throws Exception {
+        System.out.println(obj);
         User found = this.repo.findById(id).orElseThrow(() -> new ElementNotFoundException(id.toString()));
         found.setBlogTitle(obj.blogTitle());
         found.setName(obj.name());

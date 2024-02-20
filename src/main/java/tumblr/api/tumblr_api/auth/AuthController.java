@@ -2,6 +2,7 @@ package tumblr.api.tumblr_api.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import tumblr.api.tumblr_api.exceptions.BadRequestException;
@@ -27,6 +28,9 @@ public class AuthController {
     @Autowired
     JWTTools tools;
 
+    @Autowired
+    PasswordEncoder bcrypt;
+
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public LoginResponse login(@RequestBody @ModelAttribute LoginDTO body) throws ElementNotFoundException, UnauthorizedException {
@@ -34,7 +38,7 @@ public class AuthController {
         if(found == null) {
             throw new ElementNotFoundException(body.email());
         }
-        if(Objects.equals(body.password(), found.getPassword())) {
+        if(bcrypt.matches(body.password(), found.getPassword())) {
             return new LoginResponse(tools.createToken(found));
         } else throw new BadRequestException("Wrong password!");
     }
@@ -54,7 +58,7 @@ public class AuthController {
                     body.name(),
                     body.email(),
                     body.blogTitle(),
-                    body.password(),
+                    bcrypt.encode(body.password()),
                     null,
                     "http://placehold.it/300x300");
             return this.srv.save(created);
@@ -66,7 +70,7 @@ public class AuthController {
                     body.name(),
                     body.email(),
                     body.blogTitle(),
-                    body.password(),
+                    bcrypt.encode(body.password()),
                     null,
                     url);
             return this.srv.save(created);

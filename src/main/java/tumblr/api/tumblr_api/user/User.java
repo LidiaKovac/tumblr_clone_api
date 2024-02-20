@@ -36,11 +36,11 @@ public class User extends IEntity implements UserDetails {
 
     @OneToMany(fetch = FetchType.EAGER)
     @JsonIgnore
-    @JoinTable(name="users_follower", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name="follower_id"))
+    @JoinTable(name = "users_follower", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "follower_id"))
     private List<User> followers;
     @OneToMany(fetch = FetchType.EAGER)
     @JsonIgnore
-    @JoinTable(name="users_following", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name="following_id"))
+    @JoinTable(name = "users_following", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "following_id"))
     private List<User> following;
 
 //    @JsonIgnore
@@ -83,6 +83,7 @@ public class User extends IEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Questo metodo deve ritornare la lista dei ruoli (SimpleGrantedAuthority) dell'utente
         return List.of(new SimpleGrantedAuthority(this.role.name()));
     }
 
@@ -120,8 +121,6 @@ public class User extends IEntity implements UserDetails {
                 ", blogTitle='" + blogTitle + '\'' +
                 ", avatar='" + avatar + '\'' +
                 ", role=" + role +
-                ", followers=" + followers +
-                ", following=" + following +
                 '}';
     }
 }

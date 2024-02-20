@@ -4,6 +4,7 @@ package tumblr.api.tumblr_api.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -71,9 +72,16 @@ public class UserController implements IController<User, NewUserDTO, EditUserDTO
 
     @Override
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void findByIdAndDelete(UUID id) throws ElementNotFoundException {
         this.userSrv.findByIdAndDelete(id);
+    }
+
+    @DeleteMapping("/me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteSelf(@AuthenticationPrincipal User user) throws ElementNotFoundException {
+        this.userSrv.findByIdAndDelete(user.getId());
     }
 
     @Override
@@ -81,8 +89,15 @@ public class UserController implements IController<User, NewUserDTO, EditUserDTO
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public User findByIdAndUpdate(UUID id, EditUserDTO body, BindingResult validation) throws Exception {
-        if(validation.hasErrors()) throw new BadRequestException(validation.toString());
+        if (validation.hasErrors()) throw new BadRequestException(validation.toString());
         return this.userSrv.findByIdAndUpdate(id, body);
+    }
+
+    @PutMapping("/me")
+    @ResponseStatus(HttpStatus.OK)
+    public User updateSelf(@AuthenticationPrincipal User user, @RequestBody EditUserDTO body, BindingResult validation) throws Exception {
+        if (validation.hasErrors()) throw new BadRequestException(validation.toString());
+        return this.userSrv.findByIdAndUpdate(user.getId(), body);
     }
 
     @Override
@@ -90,9 +105,9 @@ public class UserController implements IController<User, NewUserDTO, EditUserDTO
         return null;
     }
 
-    @PutMapping("/{id}/follow/{followId}")
-    public User follow(@PathVariable UUID id, @PathVariable UUID followId) throws ElementNotFoundException {
-        return this.userSrv.addFollower(id, followId);
+    @PutMapping("/follow/{followId}")
+    public User follow(@AuthenticationPrincipal User user, @PathVariable UUID followId) throws ElementNotFoundException {
+        return this.userSrv.addFollower(user.getId(), followId);
     }
 
 }

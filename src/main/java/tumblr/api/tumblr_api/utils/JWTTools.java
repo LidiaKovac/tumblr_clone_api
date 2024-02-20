@@ -28,8 +28,7 @@ public class JWTTools {
         try {
             Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(secret.getBytes())).build().parse(token);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            throw new UnauthorizedException("Token invalid! " + e);
+            throw new UnauthorizedException("Token invalid or expired!");
         }
     }
 

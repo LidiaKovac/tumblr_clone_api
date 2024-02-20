@@ -2,8 +2,6 @@ package tumblr.api.tumblr_api.exceptions;
 
 
 import io.jsonwebtoken.ExpiredJwtException;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @RestControllerAdvice
-@Order(Ordered.LOWEST_PRECEDENCE)
 public class ExceptionsHandler {
     @ExceptionHandler({
             BadRequestException.class,
