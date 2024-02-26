@@ -24,6 +24,7 @@ public class User extends IEntity implements UserDetails {
     private UUID id;
 
     private String name;
+    @JsonIgnore
     @Column(unique = true, name = "email")
     private String email;
     private String blogTitle;
@@ -31,36 +32,37 @@ public class User extends IEntity implements UserDetails {
     private String password;
     private String avatar;
 
+    @JsonIgnore
     @Enumerated(EnumType.STRING)
     private Roles role;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JsonIgnore
     @JoinTable(name = "users_follower", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "follower_id"))
     private List<User> followers;
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JsonIgnore
     @JoinTable(name = "users_following", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "following_id"))
     private List<User> following;
 
-//    @JsonIgnore
-//    @Transient
-//    boolean enabled;
-//    @JsonIgnore
-//    @Transient
-//    SimpleGrantedAuthority authorities;
-//    @JsonIgnore
-//    @Transient
-//    String username;
-//    @JsonIgnore
-//    @Transient
-//    boolean accountNonLocked;
-//    @JsonIgnore
-//    @Transient
-//    boolean accountNonExpired;
-//    @JsonIgnore
-//    @Transient
-//    boolean credentialsNonExpired;
+    @JsonIgnore
+    @Transient
+    boolean enabled;
+    @JsonIgnore
+    @Transient
+    SimpleGrantedAuthority authorities;
+    @JsonIgnore
+    @Transient
+    String username;
+    @JsonIgnore
+    @Transient
+    boolean accountNonLocked;
+    @JsonIgnore
+    @Transient
+    boolean accountNonExpired;
+    @JsonIgnore
+    @Transient
+    boolean credentialsNonExpired;
 
     public User(String email, String name, String blogTitle, String password, String avatar) {
         this.email = email;

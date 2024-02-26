@@ -2,6 +2,7 @@ package tumblr.api.tumblr_api.exceptions;
 
 
 import io.jsonwebtoken.ExpiredJwtException;
+import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -34,6 +35,12 @@ public class ExceptionsHandler {
         return new ErrorDTO("Entity not found: " + error.getMessage(), LocalDateTime.now());
     }
 
+    @ExceptionHandler(SizeLimitExceededException.class)
+    @ResponseStatus(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED)
+    public ErrorDTO handleTooBig(SizeLimitExceededException error) {
+        return new ErrorDTO("The file was too big!", LocalDateTime.now());
+    }
+
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorDTO handleEndpointNotFound() {
@@ -43,7 +50,7 @@ public class ExceptionsHandler {
     @ExceptionHandler({UnauthorizedException.class, ExpiredJwtException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorDTO handle401(UnauthorizedException err) {
-        return new ErrorDTO("Login failed. Details: " + err , LocalDateTime.now());
+        return new ErrorDTO(err.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler({AccessDeniedException.class, ForbiddenException.class})
@@ -56,6 +63,6 @@ public class ExceptionsHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorDTO handleGeneric(Exception e) {
         e.printStackTrace();
-        return new ErrorDTO("Errore generico, risolveremo il prima possibile",LocalDateTime.now());
+        return new ErrorDTO("Errore generico, risolveremo il prima possibile", LocalDateTime.now());
     }
 }

@@ -35,7 +35,12 @@ public class UserController implements IController<User, NewUserDTO, EditUserDTO
         return null;
     }
 
-    //    @Override
+    @GetMapping("/me")
+    @ResponseStatus(HttpStatus.OK)
+    public User getMe(@AuthenticationPrincipal User user) {
+        return this.userSrv.findById(user.getId());
+    }
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
     public CompleteUserDTO findByIdComplete(@PathVariable UUID id) throws ElementNotFoundException {
         User found = this.userSrv.findById(id);
@@ -52,9 +57,23 @@ public class UserController implements IController<User, NewUserDTO, EditUserDTO
         );
     }
 
+
+
     @GetMapping("/{id}/followers")
     public List<User> getFollowersById(@PathVariable UUID id) throws ElementNotFoundException {
         User found = this.userSrv.findById(id);
+        return found.getFollowers();
+    }
+
+    @GetMapping("/me/following")
+    public List<User> getFollowing(@AuthenticationPrincipal User user) throws ElementNotFoundException {
+        User found = this.userSrv.findById(user.getId());
+        return found.getFollowing();
+    }
+
+    @GetMapping("/me/followers")
+    public List<User> getFollowers(@AuthenticationPrincipal User user) throws ElementNotFoundException {
+        User found = this.userSrv.findById(user.getId());
         return found.getFollowers();
     }
 
@@ -62,6 +81,13 @@ public class UserController implements IController<User, NewUserDTO, EditUserDTO
     public List<User> getFollowingById(@PathVariable UUID id) throws ElementNotFoundException {
         User found = this.userSrv.findById(id);
         return found.getFollowing();
+    }
+
+    @GetMapping("/suggestions")
+    public List<User> getSuggested(@AuthenticationPrincipal User user) {
+//        Remove already followed
+        List<UUID> followingIds = user.getFollowing().stream().map(u -> u.getId()).toList();
+        return this.userSrv.find().stream().filter(u -> !followingIds.contains(u.getId()) && !u.getId().equals(user.getId())).toList();
     }
 
     @Override
