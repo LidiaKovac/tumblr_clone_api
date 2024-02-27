@@ -37,7 +37,7 @@ public class PostService implements IService<Post, NewPostDTO, EditPostDTO> {
     public Post save(NewPostDTO obj) throws BadRequestException {
         User owner = this.userRepo.findById(obj.userId()).orElseThrow(() -> new ElementNotFoundException(obj.userId().toString()));
         if (owner != null) {
-            return this.repo.save(new Post(obj.markDownContent(), obj.images(), obj.tags(), owner));
+            return this.repo.save(new Post(obj.markDownContent(), obj.tags(), owner));
         } else throw new BadRequestException("This post doesn't seem to belong to anybody.");
     }
 
@@ -113,7 +113,7 @@ public class PostService implements IService<Post, NewPostDTO, EditPostDTO> {
     @Override
     public Post findByIdAndUpdate(UUID id, EditPostDTO obj) throws Exception {
         Post found = this.findById(id);
-        found.setImages(obj.images());
+//        found.setImages(obj.images());
         found.setMarkDownContent(obj.markDownContent());
         this.repo.save(found);
         return found;

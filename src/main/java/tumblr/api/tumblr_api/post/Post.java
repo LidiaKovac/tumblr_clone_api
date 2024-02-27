@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import tumblr.api.tumblr_api.comments.Comment;
 import tumblr.api.tumblr_api.entities.IEntity;
+import tumblr.api.tumblr_api.images.Image;
 import tumblr.api.tumblr_api.likes.Like;
 import tumblr.api.tumblr_api.user.User;
 
@@ -26,7 +27,11 @@ public class Post extends IEntity {
     @GeneratedValue
     private UUID id;
     private String markDownContent;
-    private List<String> images;
+
+    @OneToMany(mappedBy = "post")
+    @JsonIgnore
+    private List<Image> images;
+
     private List<String> tags;
 
     @Column
@@ -63,9 +68,9 @@ public class Post extends IEntity {
     @CreationTimestamp
     Date createdAt;
 
-    public Post(String content, List<String> images, List<String> tags, User user) {
+    public Post(String content, List<String> tags, User user) {
         this.markDownContent = content;
-        this.images = images;
+//        this.images = images;
         this.tags = tags;
         this.setUser(user);
         this.isReblog = false;
@@ -121,7 +126,6 @@ public class Post extends IEntity {
         return "Post{" +
                 "id=" + id +
                 ", markDownContent='" + markDownContent + '\'' +
-                ", images=" + images +
                 ", tags=" + tags +
                 ", notes=" + notes +
                 ", createdAt=" + createdAt +

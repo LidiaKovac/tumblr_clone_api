@@ -6,6 +6,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import tumblr.api.tumblr_api.comments.Comment;
 import tumblr.api.tumblr_api.comments.CommentsService;
 import tumblr.api.tumblr_api.comments.NewCommentDTO;
@@ -13,6 +14,9 @@ import tumblr.api.tumblr_api.controllers.IController;
 import tumblr.api.tumblr_api.entities.Note;
 import tumblr.api.tumblr_api.exceptions.BadRequestException;
 import tumblr.api.tumblr_api.exceptions.ElementNotFoundException;
+import tumblr.api.tumblr_api.images.Image;
+import tumblr.api.tumblr_api.images.ImageService;
+import tumblr.api.tumblr_api.images.NewImageDTO;
 import tumblr.api.tumblr_api.likes.Like;
 import tumblr.api.tumblr_api.user.User;
 
@@ -30,6 +34,9 @@ public class PostController implements IController<Post, NewPostDTO, EditPostDTO
 
     @Autowired
     CommentsService commSrv;
+
+    @Autowired
+    ImageService imgSrv;
 
 
     @Override
@@ -171,24 +178,24 @@ public class PostController implements IController<Post, NewPostDTO, EditPostDTO
         return null;
     }
 
+    @PostMapping("/upload")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Image upload(MultipartFile image) throws IOException {
+        Image saved = this.imgSrv.save(
+                new NewImageDTO(this.postSrv.upload(image))
+        );
+
+        return saved;
+    }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Post create(@ModelAttribute @Validated NewPostDTO body, BindingResult validation, @AuthenticationPrincipal User user) throws IOException {
+    public Post create(@Validated NewPostDTO body, BindingResult validation, @AuthenticationPrincipal User user) throws IOException {
         if (validation.hasErrors()) {
             throw new BadRequestException(String.valueOf(validation.getAllErrors()));
         } else {
             System.out.println(body);
-            List<String> imageUrls = new ArrayList<>();
-            if (body.imageFiles() != null) {
-
-                for (int i = 0; i < body.imageFiles().size(); i++) {
-                    imageUrls.add(this.postSrv.upload(body.imageFiles().get(i)));
-                }
-            }
             return this.postSrv.save(new NewPostDTO(
                     body.markDownContent(),
-                    null,
-                    imageUrls,
                     body.tags(),
                     user.getId()
             ));
