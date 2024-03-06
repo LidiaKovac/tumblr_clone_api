@@ -52,6 +52,12 @@ public class PostController implements IController<Post, NewPostDTO, EditPostDTO
         return this.postSrv.findPostsByUserId(userId);
     }
 
+    @GetMapping("/dashboard/public")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Post> getPopularPosts() {
+        return this.postSrv.getSorted();
+    }
+
     @GetMapping("/dashboard")
     @ResponseStatus(HttpStatus.OK)
     public List<Post> findFriendsPosts(@AuthenticationPrincipal User user) {
@@ -187,6 +193,7 @@ public class PostController implements IController<Post, NewPostDTO, EditPostDTO
 
         return saved;
     }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Post create(@Validated NewPostDTO body, BindingResult validation, @AuthenticationPrincipal User user) throws IOException {

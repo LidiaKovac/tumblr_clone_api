@@ -49,6 +49,6 @@ public class AuthFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest req) {
-        return new AntPathMatcher().match("/auth/**", req.getServletPath());
+        return new AntPathMatcher().match("/auth/**", req.getServletPath()) || new AntPathMatcher().match("/post/dashboard/public", req.getServletPath());
     }
 }

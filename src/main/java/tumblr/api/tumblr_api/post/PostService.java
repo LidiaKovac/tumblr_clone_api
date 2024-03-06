@@ -129,5 +129,8 @@ public class PostService implements IService<Post, NewPostDTO, EditPostDTO> {
         return (String) this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap()).get("url");
     }
 
+    public List<Post> getSorted() {
+        return this.repo.findByOrderByNotesDesc();
+    }
 
 }

@@ -17,4 +17,6 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 
 //    @Query("select p from Post p where p.isReblog=true and p.originalPostId=:id")
     List<Post> findAllByOriginalPostId(UUID id);
+
+    List<Post> findByOrderByNotesDesc();
 }
